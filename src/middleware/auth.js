@@ -9,23 +9,32 @@ const isValidObjectId = function (ObjectId) { return mongoose.Types.ObjectId.isV
 
 const authentication = async function (req, res, next) {
     try {
-        let token = req.headers["x-api-key"];
-        if (!token) token = req.headers["X-Api-Key"];
 
-        //If no token is present in the request header return error. This means the user is not logged in.
-        if (!token) return res.status(400).send({ status: false, msg: "token must be present" });
 
-        let decodedToken = jwt.verify(token, "Project1-Group45");
-        if (!decodedToken) {
-            return res.status(401).send({ status: false, msg: "token is invalid" });
-        }
+        let token = req.headers['x-api-key']
+        if (!token) { return res.status(400).send({ status: false, msg: "Token must be present" }) }
 
-        req.loggedInAuthorId = decodedToken._id
 
-        next()
+        jwt.verify(token, "project1-secrete-key", function (err, decodedToken) {
+
+            if (!err) {
+
+                return res.status(401).send({ status: false, msg: "Token is invalid" })
+
+            }
+            else {
+                req.token = decodedToken
+                console.log(req.token)
+
+                next()
+
+            }
+        })
+
     }
-    catch (err) {
-        res.status(500).send({ msg: "Error", error: err.message })
+    catch (error) {
+
+        res.status(500).send({ status: false, msg: error.message })
     }
 }
 

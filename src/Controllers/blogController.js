@@ -8,14 +8,15 @@ const isValidObjectId = function (ObjectId) { return mongoose.Types.ObjectId.isV
 
 const isValidreqbody = function (body) {
   return Object.keys(body).length > 0
-}
-
+};
+ 
 const isValid = function (value) {
   if (typeof value === "undefined" || value === null) return false
   if (typeof value === "string" && value.trim().length === 0) return false
   return true
 }
 // __________CREATE BLOG_________
+
 const createBlog = async function (req, res) {
   try {
     let data = req.body
@@ -24,6 +25,7 @@ const createBlog = async function (req, res) {
       return res.status(400).send({ status: false, msg: "Please Provide Blog Datails" })
     }
     const { title, body, authorId, tags, category, subcategory } = req.body
+
     let author = await authorModel.findById(authorId)
 
     if (!isValid(title) || !isValid(body)) {
@@ -46,7 +48,7 @@ const createBlog = async function (req, res) {
     }
 
     let savedBlog = await blogModel.create(data)
-    res.status(201).send({ msg: savedBlog })
+    res.status(201).send({ status:true, msg: savedBlog })
   }
   catch (err) {
     res.status(500).send({ status: false, Error: err.message })
@@ -75,7 +77,7 @@ const getBlog = async function (req, res) {
     //check that the getAllBlogs is empty or not
 
     if (getAllBlogs.length == 0) {
-      return res.status(404).send({ status: false, msg: "No such blog 788787" });
+      return res.status(404).send({ status: false, msg: "No such blog exists" });
     }
 
     data.isDeleted = false;
@@ -188,7 +190,7 @@ const deletedBlogByQueryParam = async function (req, res) {
       delete (oldData.authorId);
     }
 
-    let timeStamps = moment(new Date()).format('DD/MM/YYYY  h:mma') //getting the current timeStamps
+    //let timeStamps = moment(new Date()).format('DD/MM/YYYY  h:mma') //getting the current timeStamps
 
     let getBlogData = await blogModel.find({ authorId: decodedToken.authorId, data });
 
